@@ -1,0 +1,24 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "hasdata-yelp-mcp",
+  "version": "1.0.0",
+  "description": "Yelp MCP server for Cursor. Business search by category and location, place details, and the full review feed with sorting and star filters, as structured JSON. Remote MCP server hosted by HasData, connects over streamable HTTP with your HasData API key.",
+  "author": {
+    "name": "HasData",
+    "url": "https://hasdata.com"
+  },
+  "homepage": "https://hasdata.com/apis/yelp-api",
+  "repository": "https://github.com/HasData/yelp-mcp",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "yelp",
+    "yelp-mcp",
+    "reviews",
+    "local-business",
+    "local-seo",
+    "model-context-protocol",
+    "hasdata",
+    "scraper"
+  ]
+}
