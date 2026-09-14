@@ -167,11 +167,11 @@ A prompt that names a business rather than a Yelp ID takes two calls, one search
 
 ## Tools
 
-| Tool | Credits | What it returns |
-| :--- | :--- | :--- |
-| `hasdata_yelp_place_getPlaceDetails` | 10 | Name, address, phone, website, price range, categories, overall rating, review count, hours, amenities, photos, and highlighted reviews |
-| `hasdata_yelp_reviews_getPlaceReviews` | 10 | Fetches the review feed of a single Yelp business by Yelp ID, with sorting (relevance, date, rating, elites), filtering by star rating, language and free-text query, and… |
-| `hasdata_yelp_search_getSearchResults` | 10 | A ranked list of businesses with Yelp alias/ID, name, categories, rating, review count, price tier, neighborhood, and thumbnail |
+| Tool | What it returns |
+| --- | --- |
+| `hasdata_yelp_place_getPlaceDetails` | Name, address, phone, website, price range, categories, overall rating, review count, hours, amenities, photos, and highlighted reviews. 10 credits a call |
+| `hasdata_yelp_reviews_getPlaceReviews` | Fetches the review feed of a single Yelp business by Yelp ID, with sorting (relevance, date, rating, elites), filtering by star rating, language and free-text query, and…. 10 credits a call |
+| `hasdata_yelp_search_getSearchResults` | A ranked list of businesses with Yelp alias/ID, name, categories, rating, review count, price tier, neighborhood, and thumbnail. 10 credits a call |
 
 Three tools, 10 credits per successful call. Every tool accepts `domain` to switch country, one of 41 values, from `www.yelp.com` through the European, Asian and Latin American sites, including the language-specific variants such as `fr.yelp.ca` and `zh.yelp.com.hk`.
 
