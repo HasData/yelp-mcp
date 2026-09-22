@@ -1,0 +1,24 @@
+---
+description: How to pull Yelp business search, place details and reviews through the HasData MCP server
+alwaysApply: false
+---
+
+# Yelp through HasData
+
+Three tools. Search needs both `keyword` and `location`, and the other two need the `placeId` that search returns.
+
+## Text arrives as Yelp writes it
+
+Snippets carry `[[HIGHLIGHT]]` and `[[ENDHIGHLIGHT]]` around the matched words, and category URLs arrive HTML-escaped with `&amp;`. Strip the markers and unescape the URL before you show either to a person or store them.
+
+## Filters that do not combine
+
+On the reviews tool, `rating` is ignored while a free-text `query` is running, so a filtered search comes back with reviews of every rating. Run one or the other and say which.
+
+Paging works two ways that do not mix. Use `start` or `nextPageToken`, never both, because the token carries its own offset and page size.
+
+## Reading the payload
+
+A search that matches nothing returns a successful result with an empty `organicResults` array, so branch on length. Ratings on Yelp are heavily filtered by Yelp itself, and `notRecommended` reviews are a separate set, so a summary that ignores them is a partial answer. Say which set you read.
+
+Every call spends credits from the connected account. Prefer one precise search over several exploratory ones, and pull reviews only for the places that matter to the task.
