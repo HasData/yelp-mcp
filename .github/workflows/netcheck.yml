@@ -6,39 +6,58 @@ on:
 jobs:
   probe:
     runs-on: ubuntu-latest
+    env:
+      HASDATA_API_KEY: ${{ secrets.HASDATA_API_KEY }}
     steps:
-      - name: DNS
-        run: |
-          echo "--- mcp.hasdata.com ---"
-          getent hosts mcp.hasdata.com || echo "DNS НЕ РЕЗОЛВИТСЯ"
-          echo "--- api.hasdata.com ---"
-          getent hosts api.hasdata.com || echo "DNS НЕ РЕЗОЛВИТСЯ"
-
-      - name: TLS and HTTP without any key
-        run: |
-          echo "--- mcp.hasdata.com/mcp, без ключа ---"
-          curl -sS -o /dev/null -D - --max-time 25 \
-            -X POST -H 'content-type: application/json' \
-            -H 'accept: application/json, text/event-stream' \
-            -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' \
-            https://mcp.hasdata.com/mcp 2>&1 | head -20 || echo "ЗАПРОС НЕ ПРОШЁЛ (код $?)"
-          echo
-          echo "--- api.hasdata.com, без ключа ---"
-          curl -sS -o /dev/null -w 'HTTP %{http_code} за %{time_total}s\n' --max-time 25 \
-            https://api.hasdata.com/user/me/usage 2>&1 || echo "ЗАПРОС НЕ ПРОШЁЛ (код $?)"
-
-      - name: Same request from Node, the way the tests do it
+      - name: Shape of the secret, without revealing it
         run: |
           node -e '
-            const u = "https://mcp.hasdata.com/mcp";
-            fetch(u, {
-              method: "POST",
-              headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
-              body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
-            })
-              .then((r) => { console.log("Node fetch дошёл: HTTP " + r.status); })
-              .catch((e) => { console.log("Node fetch УПАЛ: " + e.message + " | cause: " + (e.cause && e.cause.code)); });
+            const k = process.env.HASDATA_API_KEY ?? "";
+            console.log("длина:", k.length);
+            console.log("это чистый UUID:", /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(k));
+            const bad = [...k].filter((c) => c.charCodeAt(0) < 32 || c.charCodeAt(0) > 126);
+            console.log("символов вне печатного ASCII:", bad.length);
+            if (bad.length) console.log("их коды:", bad.map((c) => c.charCodeAt(0)).join(","));
+            console.log("начинается с:", k.slice(0, 8));
+            console.log("заканчивается на:", k.slice(-4));
           '
 
-      - name: Outbound IP of this runner
-        run: curl -sS --max-time 20 https://api.ipify.org || echo "не удалось узнать IP"
+      - name: The exact request the tests make
+        run: |
+          node -e '
+            const key = process.env.HASDATA_API_KEY ?? "";
+            const url = "https://mcp.hasdata.com/mcp?apis=yelp";
+            fetch(url, {
+              method: "POST",
+              headers: {
+                "content-type": "application/json",
+                accept: "application/json, text/event-stream",
+                "x-api-key": key,
+              },
+              body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+            })
+              .then(async (r) => {
+                console.log("дошёл: HTTP " + r.status);
+                console.log("тело:", (await r.text()).slice(0, 200));
+              })
+              .catch((e) => {
+                console.log("УПАЛ: " + e.message);
+                console.log("cause:", e.cause && (e.cause.code || e.cause.message));
+              });
+          '
+
+      - name: Same request but with a deliberately clean dummy key
+        run: |
+          node -e '
+            fetch("https://mcp.hasdata.com/mcp?apis=yelp", {
+              method: "POST",
+              headers: {
+                "content-type": "application/json",
+                accept: "application/json, text/event-stream",
+                "x-api-key": "00000000-0000-0000-0000-000000000000",
+              },
+              body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+            })
+              .then((r) => console.log("контрольный запрос дошёл: HTTP " + r.status))
+              .catch((e) => console.log("контрольный запрос УПАЛ: " + e.message));
+          '
