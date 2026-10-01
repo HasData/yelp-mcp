@@ -1,0 +1,44 @@
+name: netcheck
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DNS
+        run: |
+          echo "--- mcp.hasdata.com ---"
+          getent hosts mcp.hasdata.com || echo "DNS НЕ РЕЗОЛВИТСЯ"
+          echo "--- api.hasdata.com ---"
+          getent hosts api.hasdata.com || echo "DNS НЕ РЕЗОЛВИТСЯ"
+
+      - name: TLS and HTTP without any key
+        run: |
+          echo "--- mcp.hasdata.com/mcp, без ключа ---"
+          curl -sS -o /dev/null -D - --max-time 25 \
+            -X POST -H 'content-type: application/json' \
+            -H 'accept: application/json, text/event-stream' \
+            -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' \
+            https://mcp.hasdata.com/mcp 2>&1 | head -20 || echo "ЗАПРОС НЕ ПРОШЁЛ (код $?)"
+          echo
+          echo "--- api.hasdata.com, без ключа ---"
+          curl -sS -o /dev/null -w 'HTTP %{http_code} за %{time_total}s\n' --max-time 25 \
+            https://api.hasdata.com/user/me/usage 2>&1 || echo "ЗАПРОС НЕ ПРОШЁЛ (код $?)"
+
+      - name: Same request from Node, the way the tests do it
+        run: |
+          node -e '
+            const u = "https://mcp.hasdata.com/mcp";
+            fetch(u, {
+              method: "POST",
+              headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+              body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+            })
+              .then((r) => { console.log("Node fetch дошёл: HTTP " + r.status); })
+              .catch((e) => { console.log("Node fetch УПАЛ: " + e.message + " | cause: " + (e.cause && e.cause.code)); });
+          '
+
+      - name: Outbound IP of this runner
+        run: curl -sS --max-time 20 https://api.ipify.org || echo "не удалось узнать IP"
