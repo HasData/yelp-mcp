@@ -389,7 +389,7 @@ Because a `query` was set at the same time. Yelp drops the star filter when it r
 
 ### Can I use this together with other HasData APIs?
 
-Yes. One key covers everything, and one endpoint serves them all through the `apis` parameter. Point a client at `?apis=yelp,google_maps` to get both tool sets in one connection, or at [`mcp.hasdata.com/api/mcp`](https://docs.hasdata.com/mcp-server?utm_source=github&utm_medium=syndication&utm_campaign=yelp-mcp) for the full catalogue.
+Yes. One key covers everything, and one endpoint serves them all through the `apis` parameter. Point a client at `?apis=yelp,google_maps` to get both tool sets in one connection, or at [`mcp.hasdata.com/mcp`](https://docs.hasdata.com/mcp-server?utm_source=github&utm_medium=syndication&utm_campaign=yelp-mcp) for the full catalogue.
 
 ### Is HasData affiliated with Yelp?
 
