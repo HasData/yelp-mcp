@@ -16,6 +16,7 @@ https://mcp.hasdata.com/mcp?apis=yelp
 [![tool contract](https://github.com/HasData/yelp-mcp/actions/workflows/contract.yml/badge.svg)](https://github.com/HasData/yelp-mcp/actions/workflows/contract.yml)
 [![MCP](https://img.shields.io/badge/MCP-remote%20%7C%20streamable%20HTTP-6366f1?style=flat-square)](https://mcp.hasdata.com/mcp?apis=yelp)
 [![Tools](https://img.shields.io/badge/tools-3-10b981?style=flat-square)](#tools)
+- [Prompts and resources](#prompts-and-resources)
 [![npm](https://img.shields.io/npm/v/@hasdata/yelp-mcp?style=flat-square&logo=npm&label=npm&color=cb3837)](https://www.npmjs.com/package/@hasdata/yelp-mcp)
 [![PyPI](https://img.shields.io/pypi/v/hasdata-yelp-mcp?style=flat-square&logo=pypi&logoColor=white&label=PyPI&color=3775a9)](https://pypi.org/project/hasdata-yelp-mcp/)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
@@ -300,6 +301,23 @@ A review the author later rewrote also carries `previousReviews`, holding the ea
   "previousReviews": [{ "id": "0WNI2IG7K1_Dg9zdXm03SA", "rating": 4, "comment": { "text": "..." } }]
 }
 ```
+
+## Prompts and resources
+
+The server ships one prompt, a ready-made workflow a client can offer instead of making the user compose a tool call.
+
+| Prompt | What it does |
+| --- | --- |
+| `yelp_reputation` | Pull a business's rating and recent review themes. |
+
+Alongside them the server exposes 2 resources, one per parameter whose accepted values are a fixed list. Reading one is cheaper than learning the vocabulary from a rejected call, and it costs no credits. Each URI is `hasdata://yelp/<parameter>`.
+
+| Parameter | Values | What it selects |
+| --- | ---: | --- |
+| `domain` | 41 | Yelp domain to use. Default is `www.yelp.com`. |
+| `sortBy` | 6 | The order in which the reviews are returned. Defaults to relevanceDesc. |
+
+Both lists are served without an API key, so a client can read them before a user has signed up.
 
 ## Errors and failure paths
 
