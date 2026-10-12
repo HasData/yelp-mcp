@@ -22,3 +22,9 @@ Paging works two ways that do not mix. Use `start` or `nextPageToken`, never bot
 A search that matches nothing returns a successful result with an empty `organicResults` array, so branch on length. Ratings on Yelp are heavily filtered by Yelp itself, and `notRecommended` reviews are a separate set, so a summary that ignores them is a partial answer. Say which set you read.
 
 Every call spends credits from the connected account. Prefer one precise search over several exploratory ones, and pull reviews only for the places that matter to the task.
+
+## Prompts and resources
+
+The server also serves resources that spell out the accepted values of every parameter that takes a fixed list, each one at `hasdata://yelp/<parameter>`. Reading one spends no credits and makes no upstream request, which beats discovering the vocabulary from a rejected call. Listing them needs no API key either, so a client can read them before the user has connected an account.
+
+Ready-made prompts cover the usual workflows. Offer one of those before composing a tool call by hand.
